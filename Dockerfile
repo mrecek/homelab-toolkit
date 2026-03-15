@@ -23,6 +23,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # ── System packages ──────────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
+    sshpass \
     git \
     curl \
     wget \
@@ -33,6 +34,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     lsb-release \
     apt-transport-https \
+    iputils-ping \
+    dnsutils \
+    net-tools \
+    iproute2 \
+    traceroute \
+    rsync \
+    vim-tiny \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Azure CLI ────────────────────────────────────────────────────────────────
