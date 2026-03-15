@@ -52,11 +52,9 @@ docker run -it --rm ghcr.io/mrecek/homelab-toolkit:latest
 | Tag | Description |
 |-----|-------------|
 | `latest` | Current main branch build |
-| `YYYY.MM.DD` | CalVer date of build |
-| `vX.Y.Z` | Pinned release version |
-| `<sha>` | Git commit SHA for traceability |
+| `YYYY.MM.DD-<sha>` | CalVer date + short commit SHA (e.g., `2026.03.15-abc1234`) |
 
-Weekly automated rebuilds ensure base image security patches are picked up.
+Every push to main produces both tags. Weekly automated rebuilds pick up base image security patches.
 
 ## Building Locally
 
