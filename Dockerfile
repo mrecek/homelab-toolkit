@@ -2,7 +2,7 @@
 # homelab-toolkit — General-purpose infrastructure operations container
 #
 # For homelab CI runners, Coder workspaces, and IaC workflows.
-# Includes: Ansible, Azure CLI, OpenTofu, mise, just, GitHub CLI
+# Includes: Ansible, Azure CLI, OpenTofu, mise, just, GitHub CLI, code-server
 #
 # Base: python:3.12-slim (Debian)
 ################################################################################
@@ -42,6 +42,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsync \
     vim-tiny \
     less \
+    gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Azure CLI ────────────────────────────────────────────────────────────────
@@ -86,15 +88,25 @@ RUN ansible-galaxy collection install \
     ansible.posix \
     azure.azcollection
 
-# ── Non-root user (for Coder workspaces — GH Actions runs as root) ──────────
+# ── code-server (VS Code in browser — for Coder workspaces) ──────────────────
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+# ── Non-root users (GH Actions runs as root, ignores these) ─────────────────
+# ops: general-purpose non-root user
+# coder: Coder workspace user (shares UID 1000 with ops via -o flag)
 RUN groupadd -g 1000 ops \
     && useradd -m -u 1000 -g ops -s /bin/bash ops \
     && echo "ops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/ops \
-    && chmod 0440 /etc/sudoers.d/ops
+    && chmod 0440 /etc/sudoers.d/ops \
+    && useradd -o -m -u 1000 -g ops -d /home/coder -s /bin/bash coder \
+    && echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/coder \
+    && chmod 0440 /etc/sudoers.d/coder
 
-# Ensure mise works for the ops user too
-RUN mkdir -p /home/ops/.local/bin \
+# Ensure mise works for non-root users
+RUN mkdir -p /home/ops/.local/bin /home/coder/.local/bin \
     && ln -sf /usr/local/bin/mise /home/ops/.local/bin/mise \
-    && chown -R ops:ops /home/ops
+    && ln -sf /usr/local/bin/mise /home/coder/.local/bin/mise \
+    && chown -R ops:ops /home/ops \
+    && chown -R 1000:1000 /home/coder
 
 CMD ["/bin/bash"]
