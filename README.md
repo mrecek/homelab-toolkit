@@ -1,6 +1,6 @@
-# infra-toolkit
+# homelab-toolkit
 
-General-purpose infrastructure operations container for homelab CI runners and development workspaces.
+General-purpose homelab operations container for CI runners and development workspaces.
 
 ## What's Inside
 
@@ -20,7 +20,7 @@ General-purpose infrastructure operations container for homelab CI runners and d
 jobs:
   deploy:
     runs-on: self-hosted
-    container: ghcr.io/mrecek/infra-toolkit:latest
+    container: ghcr.io/mrecek/homelab-toolkit:latest
     steps:
       - uses: actions/checkout@v4
       - uses: azure/login@v2
@@ -35,7 +35,7 @@ jobs:
 
 ```hcl
 resource "docker_image" "workspace" {
-  name = "ghcr.io/mrecek/infra-toolkit:latest"
+  name = "ghcr.io/mrecek/homelab-toolkit:latest"
 }
 ```
 
@@ -44,7 +44,7 @@ The image includes a non-root `ops` user (UID 1000) with passwordless sudo.
 ### Local Development
 
 ```bash
-docker run -it --rm ghcr.io/mrecek/infra-toolkit:latest
+docker run -it --rm ghcr.io/mrecek/homelab-toolkit:latest
 ```
 
 ## Tags
@@ -61,5 +61,5 @@ Weekly automated rebuilds ensure base image security patches are picked up.
 ## Building Locally
 
 ```bash
-docker build -t infra-toolkit .
+docker build -t homelab-toolkit .
 ```

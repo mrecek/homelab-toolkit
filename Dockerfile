@@ -1,5 +1,5 @@
 ################################################################################
-# infra-toolkit — General-purpose infrastructure operations container
+# homelab-toolkit — General-purpose infrastructure operations container
 #
 # For homelab CI runners, Coder workspaces, and IaC workflows.
 # Includes: Ansible, Azure CLI, OpenTofu, mise, just, GitHub CLI
@@ -9,10 +9,10 @@
 
 FROM python:3.12-slim AS base
 
-LABEL org.opencontainers.image.title="infra-toolkit"
-LABEL org.opencontainers.image.description="Infrastructure operations toolkit for CI runners and dev workspaces"
+LABEL org.opencontainers.image.title="homelab-toolkit"
+LABEL org.opencontainers.image.description="Homelab operations toolkit for CI runners and dev workspaces"
 LABEL org.opencontainers.image.authors="Mark Recek"
-LABEL org.opencontainers.image.source="https://github.com/mrecek/infra-toolkit"
+LABEL org.opencontainers.image.source="https://github.com/mrecek/homelab-toolkit"
 
 # Versions — update these to bump tools
 ARG OPENTOFU_VERSION=1.9.0
