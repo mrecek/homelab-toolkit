@@ -91,25 +91,18 @@ RUN ansible-galaxy collection install \
 # ── code-server (VS Code in browser — for Coder workspaces) ──────────────────
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# ── Non-root users (GH Actions runs as root, ignores these) ─────────────────
-# ops: general-purpose non-root user
-# coder: Coder workspace user (shares UID 1000 with ops via -o flag)
+# ── Non-root user (GH Actions runs as root, ignores this) ────────────────────
+# ops: general-purpose non-root user for Coder workspaces and local use
 RUN groupadd -g 1000 ops \
     && useradd -m -u 1000 -g ops -s /bin/bash ops \
     && echo "ops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/ops \
-    && chmod 0440 /etc/sudoers.d/ops \
-    && useradd -o -m -u 1000 -g ops -d /home/coder -s /bin/bash coder \
-    && echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/coder \
-    && chmod 0440 /etc/sudoers.d/coder
+    && chmod 0440 /etc/sudoers.d/ops
 
-# Ensure mise works for non-root users + suppress Azure CLI first-run banner
-RUN mkdir -p /home/ops/.local/bin /home/coder/.local/bin \
-    /root/.azure /home/ops/.azure /home/coder/.azure \
+# Ensure mise works for non-root user + suppress Azure CLI first-run banner
+RUN mkdir -p /home/ops/.local/bin /root/.azure /home/ops/.azure \
     && ln -sf /usr/local/bin/mise /home/ops/.local/bin/mise \
-    && ln -sf /usr/local/bin/mise /home/coder/.local/bin/mise \
     && printf '[core]\ncollect_telemetry = no\nfirst_run = no\n' \
-      | tee /root/.azure/config /home/ops/.azure/config /home/coder/.azure/config > /dev/null \
-    && chown -R ops:ops /home/ops \
-    && chown -R 1000:1000 /home/coder
+      | tee /root/.azure/config /home/ops/.azure/config > /dev/null \
+    && chown -R ops:ops /home/ops
 
 CMD ["/bin/bash"]
