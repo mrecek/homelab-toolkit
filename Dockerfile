@@ -102,10 +102,13 @@ RUN groupadd -g 1000 ops \
     && echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/coder \
     && chmod 0440 /etc/sudoers.d/coder
 
-# Ensure mise works for non-root users
+# Ensure mise works for non-root users + suppress Azure CLI first-run banner
 RUN mkdir -p /home/ops/.local/bin /home/coder/.local/bin \
+    /root/.azure /home/ops/.azure /home/coder/.azure \
     && ln -sf /usr/local/bin/mise /home/ops/.local/bin/mise \
     && ln -sf /usr/local/bin/mise /home/coder/.local/bin/mise \
+    && printf '[core]\ncollect_telemetry = no\nfirst_run = no\n' \
+      | tee /root/.azure/config /home/ops/.azure/config /home/coder/.azure/config > /dev/null \
     && chown -R ops:ops /home/ops \
     && chown -R 1000:1000 /home/coder
 
