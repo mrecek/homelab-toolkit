@@ -87,7 +87,7 @@ RUN pip install --no-cache-dir \
 # ── Ansible collections (baked — installed to shared path for all users) ──────
 RUN ansible-galaxy collection install -p /usr/share/ansible/collections \
     ansible.posix \
-    "azure.azcollection>=3.3.0"
+    "azure.azcollection:>=3.3.0"
 
 # ── code-server (VS Code in browser — for Coder workspaces) ──────────────────
 RUN curl -fsSL https://code-server.dev/install.sh | sh
