@@ -71,23 +71,22 @@ RUN curl -fsSL https://mise.run | sh \
     && ln -sf /root/.local/bin/mise /usr/local/bin/mise
 
 # ── Python packages (core ops — baked system-wide) ───────────────────────────
-# NOTE: azure-cli-core intentionally excluded — Azure CLI is installed via apt above,
-# and pip azure-cli-core conflicts with azure-identity version pinning
 RUN pip install --no-cache-dir \
     PyYAML>=6.0.1 \
     ansible>=9.4.0 \
-    azure-identity>=1.16.0 \
-    azure-keyvault-secrets>=4.8.0 \
-    azure-mgmt-keyvault>=12.0.0 \
     jmespath>=1.0.1 \
     netaddr>=0.8.0 \
     requests>=2.31.0 \
     docker>=6.1.0
 
-# ── Ansible collections (baked — installed to shared path for all users) ──────
-RUN ansible-galaxy collection install -p /usr/share/ansible/collections \
+# ── Ansible collections + their pip dependencies ─────────────────────────────
+# azure.azcollection's azure_rm_common.py imports 30+ Azure SDK packages in a
+# single try/except block — if ANY are missing, ALL fail (including keyvault
+# lookups). Install the collection first, then its full pip requirements.
+RUN ansible-galaxy collection install \
     ansible.posix \
-    "azure.azcollection:>=3.3.0"
+    "azure.azcollection:>=3.3.0" \
+    && pip install --no-cache-dir -r /root/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
 
 # ── code-server (VS Code in browser — for Coder workspaces) ──────────────────
 RUN curl -fsSL https://code-server.dev/install.sh | sh
