@@ -83,7 +83,7 @@ RUN pip install --no-cache-dir \
 # azure.azcollection's azure_rm_common.py imports 30+ Azure SDK packages in a
 # single try/except block — if ANY are missing, ALL fail (including keyvault
 # lookups). Install the collection first, then its full pip requirements.
-RUN ansible-galaxy collection install \
+RUN ansible-galaxy collection install --force \
     ansible.posix \
     "azure.azcollection:>=3.3.0" \
     && pip install --no-cache-dir -r /root/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
