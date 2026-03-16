@@ -6,3 +6,7 @@ updates:
       interval: "monthly"
     labels:
       - "dependencies"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
