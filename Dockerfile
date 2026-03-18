@@ -68,7 +68,7 @@ RUN curl -fsSL "https://just.systems/install.sh" | bash -s -- --to /usr/local/bi
 
 # ── mise (tool version manager) ──────────────────────────────────────────────
 RUN curl -fsSL https://mise.run | sh \
-    && ln -sf /root/.local/bin/mise /usr/local/bin/mise
+    && cp /root/.local/bin/mise /usr/local/bin/mise
 
 # ── Python packages (core ops — baked system-wide) ───────────────────────────
 RUN pip install --no-cache-dir \
@@ -83,15 +83,15 @@ RUN pip install --no-cache-dir \
 # azure.azcollection's azure_rm_common.py imports 30+ Azure SDK packages in a
 # single try/except block — if ANY are missing, ALL fail (including keyvault
 # lookups). Install the collection first, then its full pip requirements.
-RUN ansible-galaxy collection install --force \
+RUN ansible-galaxy collection install --force -p /usr/share/ansible/collections \
     ansible.posix \
     "azure.azcollection:>=3.3.0" \
-    && pip install --no-cache-dir -r /root/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
+    && pip install --no-cache-dir -r /usr/share/ansible/collections/ansible_collections/azure/azcollection/requirements.txt
 
 # ── code-server (VS Code in browser — for Coder workspaces) ──────────────────
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# ── Non-root user (GH Actions runs as root, ignores this) ────────────────────
+# ── Non-root user (default) ──────────────────────────────────────────────────
 # ops: general-purpose non-root user for Coder workspaces and local use
 RUN groupadd -g 1000 ops \
     && useradd -m -u 1000 -g ops -s /bin/bash ops \
@@ -104,5 +104,9 @@ RUN mkdir -p /home/ops/.local/bin /root/.azure /home/ops/.azure \
     && printf '[core]\ncollect_telemetry = no\nfirst_run = no\n' \
       | tee /root/.azure/config /home/ops/.azure/config > /dev/null \
     && chown -R ops:ops /home/ops
+
+# ── Default runtime ──────────────────────────────────────────────────────────
+USER ops
+WORKDIR /home/ops
 
 CMD ["/bin/bash"]
